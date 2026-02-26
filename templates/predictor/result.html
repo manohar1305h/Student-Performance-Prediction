@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result | Student Performance Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --accent: #7209b7;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background: rgba(0,0,0,0.2) !important;
+            backdrop-filter: blur(10px);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+        }
+        .result-card {
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 6px solid rgba(255,255,255,0.4);
+        }
+        .score-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1;
+        }
+        .score-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.85);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+        .grade-badge {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 10px 25px;
+            border-radius: 50px;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+        .detail-value {
+            font-weight: 700;
+            color: #333;
+            background: #f8f9fa;
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+        .progress-custom {
+            height: 14px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+        .progress-bar-custom {
+            border-radius: 10px;
+            transition: width 1.5s ease-in-out;
+        }
+        .btn-back {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 12px;
+            padding: 12px 35px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(67,97,238,0.4);
+            color: white;
+        }
+        .recommendation-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+        footer {
+            color: rgba(255,255,255,0.7);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Student Performance Predictor
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <!-- Page Title -->
+        <div class="text-center text-white mb-4">
+            <h2 class="fw-bold"><i class="fas fa-chart-pie me-2"></i>Your Prediction Result</h2>
+            <p class="opacity-75">Based on your inputs, here is your predicted academic performance</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <!-- Main Result Card -->
+            <div class="col-lg-6 mb-4">
+                <div class="card result-card">
+                    <!-- Score Header -->
+                    <div class="bg-{{ color }} text-white text-center py-5">
+                        <div class="score-circle bg-{{ color }} mb-4" style="background: rgba(255,255,255,0.2) !important;">
+                            <span class="score-number">{{ predicted_score }}</span>
+                            <span class="score-label">out of 100</span>
+                        </div>
+                        <span class="badge grade-badge bg-white text-dark">{{ grade }}</span>
+                        <p class="mt-3 mb-0 opacity-90 fs-5 fw-semibold">
+                            {% if predicted_score >= 80 %}
+                                Outstanding performance! Keep it up!
+                            {% elif predicted_score >= 60 %}
+                                Good performance! You can do better!
+                            {% elif predicted_score >= 50 %}
+                                Average performance. More effort needed.
+                            {% else %}
+                                Below average. Please focus more on studies.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Score Progress -->
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-muted mb-3">PERFORMANCE METER</h6>
+                        <div class="progress progress-custom mb-3">
+                            <div class="progress-bar progress-bar-custom bg-{{ color }}"
+                                 role="progressbar"
+                                 style="width: {{ predicted_score }}%"
+                                 aria-valuenow="{{ predicted_score }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>0</span>
+                            <span class="fw-bold text-dark">{{ predicted_score }}/100</span>
+                            <span>100</span>
+                        </div>
+
+                        <!-- Input Summary -->
+                        <h6 class="fw-bold text-muted mt-4 mb-3">YOUR INPUT SUMMARY</h6>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-book text-primary me-2"></i>Daily Study Hours</span>
+                            <span class="detail-value">{{ study_hours }} hrs</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-user-check text-success me-2"></i>Attendance</span>
+                            <span class="detail-value">{{ attendance }}%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-star text-warning me-2"></i>Previous Score</span>
+                            <span class="detail-value">{{ previous_score }}/100</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-moon text-info me-2"></i>Sleep Hours</span>
+                            <span class="detail-value">{{ sleep_hours }} hrs</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-file-alt text-danger me-2"></i>Sample Papers</span>
+                            <span class="detail-value">{{ sample_papers }} papers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="col-lg-5 mb-4">
+                <h5 class="text-white fw-bold mb-3"><i class="fas fa-lightbulb me-2"></i>Recommendations</h5>
+
+                {% if study_hours < 6 %}
+                <div class="recommendation-card">
+                    <h6 class="fw-bold text-danger"><i class="fas fa-book me-2"></i>Increase Study Hours</h6>
+                    <p class="small text-muted mb-0">You are studying {{ study_hours }} hours/day. Try to increase to at least 6-8 hours daily for better results.</p>
+                </div>
+                {% endif %}
+
+                {% if attendance < 85 %}
+                <div class="recommendation-card">
+                    <h6 class="fw-bold text-warning"><i class="fas fa-user-check me-2"></i>Improve Attendance</h6>
+                    <p class="small text-muted mb-0">Your attendance is {{ attendance }}%. Maintaining at least 85% attendance is crucial for academic success.</p>
+                </div>
+                {% endif %}
+
+                {% if sleep_hours < 7 or sleep_hours > 9 %}
+                <div class="recommendation-card">
+                    <h6 class="fw-bold text-info"><i class="fas fa-moon me-2"></i>Optimize Sleep Schedule</h6>
+                    <p class="small text-muted mb-0">Aim for 7-8 hours of quality sleep per night to improve concentration and memory retention.</p>
+                </div>
+                {% endif %}
+
+                {% if sample_papers < 5 %}
+                <div class="recommendation-card">
+                    <h6 class="fw-bold text-primary"><i class="fas fa-file-alt me-2"></i>Practice More Papers</h6>
+                    <p class="small text-muted mb-0">You have practiced {{ sample_papers }} papers. Solve at least 5+ sample papers to build exam confidence.</p>
+                </div>
+                {% endif %}
+
+                <div class="recommendation-card">
+                    <h6 class="fw-bold"><i class="fas fa-trophy text-warning me-2"></i>Key Success Factors</h6>
+                    <ul class="small text-muted mb-0 ps-3">
+                        <li>Consistent daily study routine</li>
+                        <li>Regular revision of notes</li>
+                        <li>Group study for complex topics</li>
+                        <li>Take breaks using Pomodoro technique</li>
+                        <li>Stay hydrated and eat healthy</li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-4 d-grid gap-2">
+                    <a href="/" class="btn btn-back">
+                        <i class="fas fa-redo me-2"></i>Try Another Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><i class="fas fa-code me-1"></i> Student Performance Predictor | Built with Django & Machine Learning</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animate progress bar on load
+        window.addEventListener('load', function() {
+            const progressBar = document.querySelector('.progress-bar-custom');
+            if (progressBar) {
+                const width = progressBar.getAttribute('aria-valuenow');
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.width = width + '%';
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
